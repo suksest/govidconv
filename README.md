@@ -1,7 +1,7 @@
 # Go Video Converter
 
 ## Description
-Video converter built with Golang and supported by ffmpeg as converter
+Video converter built with Golang and supported by `ffmpeg` as converter
 
 ## How to use it
 
@@ -27,3 +27,6 @@ make all
 ```
 
 - Access the API
+
+    Prepare the request like this
+    ![Insomnia Request](insomnia.png)
