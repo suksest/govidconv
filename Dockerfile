@@ -20,4 +20,5 @@ EXPOSE 5000
 
 COPY --from=builder /app/engine /app/config.json /app/
 
-CMD /app/engine
+CMD mkdir files && \
+    /app/engine

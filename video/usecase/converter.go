@@ -195,7 +195,7 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 
 	outputFilename := generateOutputFilename(op, filepath)
 
-	outputFile := os.TempDir() + "/" + outputFilename
+	outputFile := "files/" + outputFilename
 
 	chanErr := make(chan error)
 	go convert(filepath, vidCodec, audCodec, compressRate, outputFile, chanErr)
@@ -205,7 +205,7 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 		return "", err
 	}
 
-	downloadPath = os.TempDir() + "/" + outputFilename
+	downloadPath = "static/" + outputFilename
 
 	return
 }

@@ -18,5 +18,6 @@ func main() {
 	vu := usecase.NewVideoUsecase()
 	handler.NewVideoHandler(router, vu)
 
+	router.Static("static", "/app/files")
 	router.Start(":" + os.Getenv("PORT"))
 }
