@@ -60,6 +60,6 @@ func (vh *VideoHandler) Convert(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
-		"downloadPath": downloadPath,
+		"downloadPath": c.Request().Host + "/" + downloadPath,
 	})
 }

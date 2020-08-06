@@ -165,6 +165,19 @@ func getCompressRate(rate string, filepath string) (bitrate string, err error) {
 	return
 }
 
+func convert(inputFile, vidCodec, audCodec, compressRate, outputFile string, chanErr chan error) {
+	cmd := exec.Command("ffmpeg",
+		"-i", inputFile,
+		"-c:v", vidCodec,
+		"-c:a", audCodec,
+		"-b:v", compressRate,
+		outputFile)
+	chanErr <- cmd.Start()
+	if chanErr != nil {
+		chanErr <- cmd.Wait()
+	}
+}
+
 func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPreset) (downloadPath string, err error) {
 	filepath := os.TempDir() + "/" + file.Filename
 	if err = save(file); err != nil {
@@ -182,22 +195,17 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 
 	outputFilename := generateOutputFilename(op, filepath)
 
-	cmd := exec.Command("ffmpeg",
-		"-i", filepath,
-		"-c:v", vidCodec,
-		"-c:a", audCodec,
-		"-b:v", compressRate,
-		os.TempDir()+"/"+outputFilename)
-	err = cmd.Start()
+	outputFile := "files/" + outputFilename
+
+	chanErr := make(chan error)
+	go convert(filepath, vidCodec, audCodec, compressRate, outputFile, chanErr)
+	err = <-chanErr
 	if err != nil {
-		log.Printf("Error running command: %v", err)
+		log.Printf("Error running command: %v", <-chanErr)
 		return "", err
 	}
-	log.Printf("Waiting for command %v to finish...", cmd.String())
-	err = cmd.Wait()
-	log.Printf("Command finished with error: %v", err)
 
-	downloadPath = os.TempDir() + "/" + outputFilename
+	downloadPath = "static/" + outputFilename
 
 	return
 }
