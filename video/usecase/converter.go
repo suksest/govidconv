@@ -50,14 +50,11 @@ func save(file *multipart.FileHeader) (err error) {
 	return
 }
 
-func generateOutputFilename(op domain.OutputPreset, inputFile string) (outputFilename string) {
+func generateOutputFilename(format string, inputFile string) (outputFilename string) {
 	toHash := fmt.Sprintf("%s_%s", inputFile, string(time.Now().UnixNano()))
 	hashed := sha256.Sum256([]byte(toHash))
-	var format string
-	if op.Format == "keep" {
+	if format == "keep" {
 		format = filepath.Ext(inputFile)
-	} else {
-		format = op.Format
 	}
 	outputFilename = fmt.Sprintf("%s___%x%s", randomString(5), hashed, format)
 
@@ -193,7 +190,7 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 		return "", err
 	}
 
-	outputFilename := generateOutputFilename(op, filepath)
+	outputFilename := generateOutputFilename(op.Format, filepath)
 
 	outputFile := "files/" + outputFilename
 
