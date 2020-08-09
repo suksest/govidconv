@@ -50,14 +50,11 @@ func save(file *multipart.FileHeader) (err error) {
 	return
 }
 
-func generateOutputFilename(op domain.OutputPreset, inputFile string) (outputFilename string) {
+func generateOutputFilename(format string, inputFile string) (outputFilename string) {
 	toHash := fmt.Sprintf("%s_%s", inputFile, string(time.Now().UnixNano()))
 	hashed := sha256.Sum256([]byte(toHash))
-	var format string
-	if op.Format == "keep" {
+	if format == "keep" {
 		format = filepath.Ext(inputFile)
-	} else {
-		format = op.Format
 	}
 	outputFilename = fmt.Sprintf("%s___%x%s", randomString(5), hashed, format)
 
@@ -78,12 +75,8 @@ func randomString(n int) (generated string) {
 	return
 }
 
-func getAVCodec(format string, inVidCodec string, inAudCodec string) (vidCodec string, audCodec string, err error) {
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-	file, err := os.Open(path + "/config.json")
+func getAVCodec(configFilePath string, format string, inVidCodec string, inAudCodec string) (vidCodec string, audCodec string, err error) {
+	file, err := os.Open(configFilePath)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
@@ -103,13 +96,15 @@ func getAVCodec(format string, inVidCodec string, inAudCodec string) (vidCodec s
 				vidCodec = formats.Formats[i].Video.Default
 				break
 			} else {
-				for j := 0; j < len(formats.Formats[i].Video.Others); j++ {
+				found := false
+				for j := 0; j < len(formats.Formats[i].Video.Others) && !found; j++ {
 					if inVidCodec == formats.Formats[i].Video.Others[j] {
 						vidCodec = formats.Formats[i].Video.Others[j]
-						break
-					} else {
-						err = errors.New("invalid video codec options")
+						found = true
 					}
+				}
+				if !found {
+					err = errors.New("invalid video codec options")
 				}
 			}
 		}
@@ -121,13 +116,15 @@ func getAVCodec(format string, inVidCodec string, inAudCodec string) (vidCodec s
 				audCodec = formats.Formats[i].Audio.Default
 				break
 			} else {
-				for j := 0; j < len(formats.Formats[i].Audio.Others); j++ {
+				found := false
+				for j := 0; j < len(formats.Formats[i].Audio.Others) && !found; j++ {
 					if inAudCodec == formats.Formats[i].Audio.Others[j] {
 						audCodec = formats.Formats[i].Audio.Others[j]
-						break
-					} else {
-						err = errors.New("invalid audio codec options")
+						found = true
 					}
+				}
+				if !found {
+					err = errors.New("invalid audio codec options")
 				}
 			}
 		}
@@ -184,7 +181,7 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 		log.Println(err)
 		return "", err
 	}
-	vidCodec, audCodec, err := getAVCodec(op.Format, op.VideoCodec, op.AudioCodec)
+	vidCodec, audCodec, err := getAVCodec("config.json", op.Format, op.VideoCodec, op.AudioCodec)
 	if err != nil {
 		return "", err
 	}
@@ -193,7 +190,7 @@ func (uc *videoUsecase) Convert(file *multipart.FileHeader, op domain.OutputPres
 		return "", err
 	}
 
-	outputFilename := generateOutputFilename(op, filepath)
+	outputFilename := generateOutputFilename(op.Format, filepath)
 
 	outputFile := "files/" + outputFilename
 
