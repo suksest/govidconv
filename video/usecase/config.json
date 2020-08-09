@@ -1,0 +1,37 @@
+{
+    "formats": [
+        {
+            "extension": ".mp4",
+            "video": {
+                "default": "h264",
+                "others": ["h265", "mpeg1video", "mpeg2video", "mpeg4"]
+            },
+            "audio": {
+                "default": "aac",
+                "others": ["mp3", "mp2"]
+            }
+        },
+        {
+            "extension": ".mkv",
+            "video": {
+                "default": "h264",
+                "others": ["h265", "mpeg1video", "mpeg2video", "mpeg4", "xvid", "vp8", "theora", "huffyuv"]
+            },
+            "audio": {
+                "default": "aac",
+                "others": ["mp3", "flac", "vorbis"]
+            }
+        },
+        {
+            "extension": ".mov",
+            "video": {
+                "default": "h264",
+                "others": ["h265", "mpeg1video", "mpeg2video", "mpeg4", "xvid", "vp8", "theora", "mjpeg"]
+            },
+            "audio": {
+                "default": "aac",
+                "others": ["mp3", "pcm_s16_le"]
+            }
+        }
+    ]
+}
