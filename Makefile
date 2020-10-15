@@ -1,5 +1,8 @@
 BINARY=engine
-all: test clean run
+all: setup test clean run
+
+setup: 
+	sudo apt-get install ffmpeg
 
 test : 
 		go test ./...

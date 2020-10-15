@@ -21,7 +21,7 @@ docker container run --name vidconv -d -p 5000:5000 registry.gitlab.com/prosa-ba
 git clone git@gitlab.com:prosa-backend-test/video-converter.git
 ```
 
-- Run
+- Setup and Run
 ```shell
 make all
 ```
