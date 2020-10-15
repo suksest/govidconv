@@ -50,13 +50,13 @@ func parseOutputPreset(c echo.Context) (op domain.OutputPreset) {
 func (vh *VideoHandler) Convert(c echo.Context) (err error) {
 	file, err := c.FormFile("file")
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "internal server error")
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	op := parseOutputPreset(c)
 
 	downloadPath, err := vh.VideoUsecase.Convert(file, op)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "internal server error")
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
